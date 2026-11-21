@@ -72,7 +72,11 @@ class PhotoResult(BaseModel):
     pothole_probability: float | None = Field(
         default=None, description="有坑概率；待人工复核时为 null")
     votes_used: list[VoteUsed] = Field(default_factory=list)
-    votes_ignored: int = Field(default=0, description="因标注员不在已拟合组而未采用的票数")
+    votes_ignored: int = Field(
+        default=0,
+        description="未采用的票数：标注员不在任何组、所在组缺专家标签，"
+                    "或所在组在原 200 轮与共享补算额度内仍未收敛",
+    )
     note: str = ""
 
 

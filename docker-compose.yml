@@ -1,6 +1,28 @@
 services:
   review-api:
     build: .
+    image: pothole-review-api:latest
     ports:
       - "8000:8000"
     restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import sys, urllib.request; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2).status == 200 else 1)"
+      interval: 2s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
+
+  demo:
+    build: .
+    image: pothole-review-api:latest
+    depends_on:
+      review-api:
+        condition: service_healthy
+    volumes:
+      - ./demo:/demo:ro
+    command: ["python", "/demo/demo.py", "--base-url", "http://review-api:8000"]
+    restart: "no"
